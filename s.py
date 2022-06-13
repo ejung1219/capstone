@@ -142,5 +142,3 @@ def ssd():
                 rect = patches.Rectangle((x, y), w, h, linewidth=1, edgecolor='r', facecolor='none')
                 ax.add_patch(rect)
                 ax.text(x, y, "{} {:.0f}%".format(classes_to_labels[classes[idx] - 1], confidences[idx]*100), bbox=dict(facecolor='white', alpha=0.5))
-
-ssd()
