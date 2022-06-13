@@ -13,7 +13,7 @@ from skimage import io, transform
 def video_partition():
     count = []
     for i in range(1, 100):
-        filepath = 'C:\\Users\\topia1998\\%d.mp4' % i
+        filepath = '/%d.mp4' % i
         if os.path.isfile(filepath):
             video = cv2.VideoCapture(filepath)
 
@@ -33,8 +33,8 @@ def video_partition():
                     break 
                 ret, image = video.read()
                 if(int(video.get(1)) % (int)(fps) == 0):
-                    createFolder("C:\\Users\\topia1998\\video%d" % i)
-                    cv2.imwrite("C:\\Users\\topia1998\\video%d\\frame%d.png" % (i, cnt), image)
+                    createFolder("/video%d" % i)
+                    cv2.imwrite("/video%d/frame%d.png" % (i, cnt), image)
 
                     cnt += 1
             video.release()
@@ -101,11 +101,13 @@ def ssd():
     ssd_model.to('cuda')
     ssd_model.eval()
 
+    target = cv2.imread("/target.png")
+
     for j in range(1, v + 1):   
         count = 1    
         uris = list()
         for i in range(k[j - 1]):
-            uris.append('C:\\Users\\topia1998\\video%d\\frame%d.png' % (j, i))
+            uris.append('/video%d/frame%d.png' % (j, i))
 
         inputs = [prepare(uri) for uri in uris]
         tensor = utils.prepare_tensor(inputs)
@@ -114,11 +116,12 @@ def ssd():
             detections_batch = ssd_model(tensor)
 
         results_per_input = utils.decode_results(detections_batch)
-        best_results_per_input = [utils.pick_best(results, 0.40) for results in results_per_input]
+        best_results_per_input = [utils.pick_best(results, 0.6) for results in results_per_input]
         classes_to_labels = utils.get_coco_object_dictionary()
-        createFolder("C:\\Users\\topia1998\\result%d" % j)
+        createFolder("/result%d" % j)
+        cv2.imwrite("/result%d/target.png" % j, target)
         for image_idx in range(len(best_results_per_input)):
-            tmp = plt.imread('C:\\Users\\topia1998\\video%d\\frame%d.png' % (j, image_idx))
+            tmp = plt.imread('/video%d/frame%d.png' % (j, image_idx))
             fig, ax = plt.subplots(1)
             image = inputs[image_idx] / 2 + 0.5
             ax.imshow(image)
@@ -134,7 +137,7 @@ def ssd():
                     if x < 0:
                         x = 0
                     cropped = tmp[int(y):int(y+h), int(x):int(x+w)]
-                    plt.imsave("C:\\Users\\topia1998\\result%d\\%d.png" % (j, count), cropped)
+                    plt.imsave("/result%d/%d.png" % (j, count), cropped)
                     count += 1
                 rect = patches.Rectangle((x, y), w, h, linewidth=1, edgecolor='r', facecolor='none')
                 ax.add_patch(rect)
