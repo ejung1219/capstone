@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Depends, Request,status, File, UploadFile
+from fastapi import FastAPI, HTTPException, Depends,status, File, UploadFile
 from typing import List
 from hashing import Hash
 from jwttoken import create_access_token
@@ -7,6 +7,9 @@ from models import User
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
 from config import db
+from s import ssd
+from modular import play
+
 import uvicorn
 import os
 
@@ -60,13 +63,31 @@ async def login(request:OAuth2PasswordRequestForm = Depends()):
 	access_token = create_access_token(data={"sub": user["username"] })
 	return {"access_token": access_token, "token_type": "bearer"}
 
-@app.put("/update")
-async def update_student(current_user:User = Depends(get_current_active_user)):
-    realname = current_user.username
-    user_score = current_user.score
-    db["users"].update_one({'username': realname}, {'$set': {'score': user_score + 1}})
+@app.put("/play")
+async def algo(current_user:User = Depends(get_current_active_user)):
+#algorithm
+    ssd()
+    cnt = play()
+    score = 0
+    if cnt < 20:
+        score = 20
+    elif cnt < 50:
+        score = 50
+    elif cnt < 80:
+        score = 80
+    elif cnt < 100:
+        score = 100
+    elif cnt < 150:
+        score = 150
+    else:
+        score = 200
 
-    return {"you get your cut!"}
+#update
+    realname = current_user.username
+    user_score = current_user.score + score
+    db["users"].update_one({'username': realname}, {'$set': {'score': user_score}})
+
+    return {"you get your cut!" : score}
 
 @app.get("/users/me/", response_model=User)
 async def read_users_me(current_user: User = Depends(get_current_active_user)):
