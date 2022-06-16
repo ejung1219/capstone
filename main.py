@@ -46,7 +46,7 @@ async def create_upload_files(num : int, current_user:User = Depends(get_current
 
     if num != current_user.target_num:
         db["users"].update_one({'username': realname}, {'$set': {'target_num': num}})
-
+#
     for file in files:
         contents = await file.read()
         with open(os.path.join(UPLOAD_DIRECTORY, file.filename), "wb") as fp:
