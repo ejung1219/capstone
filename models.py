@@ -7,6 +7,7 @@ class User(BaseModel):
     password: str
     filename : str = "video.mp4"
     targetname : str = "target.png"
+    target_num : int = 3
 class Login(BaseModel):
 	username: str
 	password: str

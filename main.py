@@ -35,15 +35,24 @@ def read_root():
 async def create_files(current_user:User = Depends(get_current_user),files: List[bytes] = File(...)):
     return {"file_sizes": [len(file) for file in files]}
 
+#@app.post("/test")
+#    async def create_test(num : number_object):
+
+
 @app.post("/uploadfiles")
-async def create_upload_files(current_user:User = Depends(get_current_user),files: List[UploadFile] = File(...)):
+async def create_upload_files(num : int, current_user:User = Depends(get_current_user),  files: List[UploadFile] = File(...) ):
     UPLOAD_DIRECTORY = "./"
+    realname = current_user.username
+
+    if num != current_user.target_num:
+        db["users"].update_one({'username': realname}, {'$set': {'target_num': num}})
+
     for file in files:
         contents = await file.read()
         with open(os.path.join(UPLOAD_DIRECTORY, file.filename), "wb") as fp:
             fp.write(contents)
         print(file.filename)
-        realname = current_user.username
+
 
         if(file.filename[-4:] == ".mp4"):
             if(current_user.filename == "video.mp4"):
