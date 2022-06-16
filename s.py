@@ -124,7 +124,7 @@ def ssd():
             tmp = plt.imread('./video%d/frame%d.png' % (j, image_idx))
             fig, ax = plt.subplots(1)
             image = inputs[image_idx] / 2 + 0.5
-            ax.imshow(image)
+#            ax.imshow(image)
             bboxes, classes, confidences = best_results_per_input[image_idx]
             for idx in range(len(bboxes)):
                 left, bot, right, top = bboxes[idx]
