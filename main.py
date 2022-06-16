@@ -8,7 +8,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
 from config import db
 #from s import ssd
-#from modular import play
+from modular import play
 
 import uvicorn
 import os
@@ -35,9 +35,6 @@ def read_root():
 async def create_files(current_user:User = Depends(get_current_user),files: List[bytes] = File(...)):
     return {"file_sizes": [len(file) for file in files]}
 
-#@app.post("/test")
-#    async def create_test(num : number_object):
-
 
 @app.post("/uploadfiles")
 async def create_upload_files(num : int, current_user:User = Depends(get_current_user),  files: List[UploadFile] = File(...) ):
@@ -51,16 +48,16 @@ async def create_upload_files(num : int, current_user:User = Depends(get_current
         contents = await file.read()
         with open(os.path.join(UPLOAD_DIRECTORY, file.filename), "wb") as fp:
             fp.write(contents)
-        print(file.filename)
-
 
         if(file.filename[-4:] == ".mp4"):
             if(current_user.filename == "video.mp4"):
                 db["users"].update_one({'username': realname}, {'$set': {'filename': file.filename}})
 
         elif(file.filename[-4:] == ".png"):
-            if(current_user.targetname == "target.png"):
+            if(current_user.targetname == "default.png"):
                 db["users"].update_one({'username': realname}, {'$set': {'targetname': file.filename}})
+            elif(current_user.targetname2 == "default2.png"):
+                db["users"].update_one({'username': realname}, {'$set': {'targetname2': file.filename}})
 
     return {"filenames": [file.filename for file in files]}
 
@@ -81,13 +78,19 @@ async def login(request:OAuth2PasswordRequestForm = Depends()):
 		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail = f'Wrong Username or password')
 	access_token = create_access_token(data={"sub": user["username"] })
 	return {"access_token": access_token, "token_type": "bearer"}
+
+
 """"
 @app.put("/play")
 async def algo(current_user:User = Depends(get_current_active_user)):
 #algorithm
 
-    ssd()
-    cnt = play()
+    list_name = []
+    list_name.append(current_user.targetname)
+    list_name.append(current_user.targetname2)
+        
+    ssd(list_name)
+    cnt = play(list_name)
     score = 0
     if cnt < 20:
         score = 20
