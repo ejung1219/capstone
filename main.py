@@ -43,6 +43,16 @@ async def create_upload_files(current_user:User = Depends(get_current_user),file
         with open(os.path.join(UPLOAD_DIRECTORY, file.filename), "wb") as fp:
             fp.write(contents)
         print(file.filename)
+        realname = current_user.username
+
+        if(file.filename[-4:] == ".mp4"):
+            if(current_user.filename == "video.mp4"):
+                db["users"].update_one({'username': realname}, {'$set': {'filename': file.filename}})
+
+        elif(file.filename[-4:] == ".png"):
+            if(current_user.targetname == "target.png"):
+                db["users"].update_one({'username': realname}, {'$set': {'targetname': file.filename}})
+
     return {"filenames": [file.filename for file in files]}
 
 @app.post('/register')

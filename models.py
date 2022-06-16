@@ -5,6 +5,8 @@ class User(BaseModel):
     username: str
     score : int = 0
     password: str
+    filename : str = "video.mp4"
+    targetname : str = "target.png"
 class Login(BaseModel):
 	username: str
 	password: str
