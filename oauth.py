@@ -18,7 +18,6 @@ def get_user(db, username: str):
     user_dict = db.find_one({"username": username})
     return UserInDB(**user_dict)
 
-
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
