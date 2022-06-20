@@ -107,6 +107,5 @@ async def algo(current_user:User = Depends(get_current_active_user)):
 async def read_users_me(current_user: User = Depends(get_current_active_user)):
     return current_user
 
-
 if __name__ == '__main__':
     uvicorn.run(app, host = '127.0.0.1', port = 8000)
