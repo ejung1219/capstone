@@ -1,6 +1,9 @@
 import os
 from pymongo import MongoClient
 from dotenv import load_dotenv
+# github에는 올리지 않은 .env 파일에서 mongodb uri와
+# jwt token 발행 시 사용하는 SECRET KEY를 가져옵니다.
+# 기본 세팅을 위한 모듈입니다.
 
 load_dotenv()
 

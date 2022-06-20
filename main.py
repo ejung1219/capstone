@@ -7,8 +7,11 @@ from models import User
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
 from config import db
-#from s import ssd
+
+from s import ssd
 from modular import play
+# s는 cropping 알고리즘, modular는 cluster 알고리즘 파일입니다.
+# 서버를 염두에 두고 개발하던 중 코랩에서 최종 개발하는 것으로 결정되었습니다.
 
 import uvicorn
 import os
@@ -27,15 +30,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
-
-@app.post("/files/")
-async def create_files(current_user:User = Depends(get_current_user),files: List[bytes] = File(...)):
-    return {"file_sizes": [len(file) for file in files]}
-
-
 @app.post("/uploadfiles")
 async def create_upload_files(num : int, current_user:User = Depends(get_current_user),  files: List[UploadFile] = File(...) ):
     UPLOAD_DIRECTORY = "./"
@@ -49,6 +43,7 @@ async def create_upload_files(num : int, current_user:User = Depends(get_current
         with open(os.path.join(UPLOAD_DIRECTORY, file.filename), "wb") as fp:
             fp.write(contents)
 
+    for file in files:
         if(file.filename[-4:] == ".mp4"):
             if(current_user.filename == "video.mp4"):
                 db["users"].update_one({'username': realname}, {'$set': {'filename': file.filename}})
@@ -56,8 +51,6 @@ async def create_upload_files(num : int, current_user:User = Depends(get_current
         elif(file.filename[-4:] == ".png"):
             if(current_user.targetname == "default.png"):
                 db["users"].update_one({'username': realname}, {'$set': {'targetname': file.filename}})
-            elif(current_user.targetname2 == "default2.png"):
-                db["users"].update_one({'username': realname}, {'$set': {'targetname2': file.filename}})
 
     return {"filenames": [file.filename for file in files]}
 
@@ -79,18 +72,17 @@ async def login(request:OAuth2PasswordRequestForm = Depends()):
 	access_token = create_access_token(data={"sub": user["username"] })
 	return {"access_token": access_token, "token_type": "bearer"}
 
-
-""""
 @app.put("/play")
 async def algo(current_user:User = Depends(get_current_active_user)):
 #algorithm
 
     list_name = []
     list_name.append(current_user.targetname)
-    list_name.append(current_user.targetname2)
-        
+    numb = current_user.target_num
+
     ssd(list_name)
-    cnt = play(list_name)
+    cnt = play(numb,list_name)
+    print(cnt)
     score = 0
     if cnt < 20:
         score = 20
@@ -104,14 +96,13 @@ async def algo(current_user:User = Depends(get_current_active_user)):
         score = 150
     else:
         score = 200
-...
 #update
     realname = current_user.username
     user_score = current_user.score + score
     db["users"].update_one({'username': realname}, {'$set': {'score': user_score}})
 
-    return {"you get your cut!" : score}
-"""
+    return {cnt : score}
+
 @app.get("/users/me/", response_model=User)
 async def read_users_me(current_user: User = Depends(get_current_active_user)):
     return current_user

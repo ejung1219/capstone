@@ -6,6 +6,9 @@ from fastapi.security import OAuth2PasswordBearer
 from models import User, TokenData
 from config import db
 
+# user 정보를 확인하기 위한 모듈입니다.
+# current user 정보를 가져올 수 있습니다.
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 class UserInDB(User):

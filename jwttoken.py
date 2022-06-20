@@ -3,6 +3,8 @@ from jose import JWTError, jwt
 from models import TokenData
 from config import settings
 
+#JWT token 발행과 확인을 위한 모듈입니다.
+
 SECRET_KEY = settings.SERCET_KEY
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60

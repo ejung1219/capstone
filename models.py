@@ -1,13 +1,14 @@
 from pydantic import BaseModel
 from typing import Optional
 
+# model들을 정의하는 모듈입니다.
+
 class User(BaseModel):
     username: str
     score : int = 0
     password: str
     filename : str = "video.mp4"
     targetname : str = "default.png"
-    targetname2 : str = "default2.png"
     target_num : int = 3
 
 class Login(BaseModel):

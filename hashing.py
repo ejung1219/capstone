@@ -1,4 +1,5 @@
 from passlib.context import CryptContext
+#hashing을 위한 모듈입니다.
 
 pwd_cxt = CryptContext(schemes =["bcrypt"],deprecated="auto")
 
